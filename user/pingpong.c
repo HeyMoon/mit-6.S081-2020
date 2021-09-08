@@ -10,7 +10,6 @@ int main(int argc, char const *argv[])
     int p2[2];
     char buf[1] = {'a'};
     char buf2[1];
-    char buf3[1];
 
     if (pipe(p1) < 0)
     {
@@ -49,20 +48,15 @@ int main(int argc, char const *argv[])
         }
     }
 
-    close(1);
-    dup(p1[1]);
     int pid = getpid();
 
-    if (write(1, buf, 1) != 1)
+    if (write(p1[1], buf, 1) != 1)
     {
         fprintf(2, "%d: write error\n", pid);
         exit(1);
     }
 
-    close(0);
-    dup(p2[0]);
-
-    if (read(0, buf3, sizeof(buf3) > 0))
+    if (read(p2[0], buf2, sizeof(buf2) > 0))
     {
         fprintf(1, "%d: received pong\n", pid);
         exit(0);
@@ -72,6 +66,6 @@ int main(int argc, char const *argv[])
     close(p1[1]);
     close(p2[0]);
     close(p2[1]);
-    
+
     exit(0);
 }
