@@ -9,7 +9,6 @@ int readline(char buf[], int max)
     int i;
     char c;
     for (i = 0; i < max - 1 && read(0, &c, 1) > 0 && c != '\n'; ++i){
-        //fprintf(2, "ch: %c",c);
         buf[i] = c;
     }
 
