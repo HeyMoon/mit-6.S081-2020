@@ -4,29 +4,25 @@
 #include "user/user.h"
 #include "kernel/fs.h"
 
-char *readline(void)
+int readline(char buf[], int max)
 {
-    int length = 512;
-    int n;
-    char *buf;
-    buf = (char *)malloc(length);
-    char ch;
-    while ((n = read(0, &ch, sizeof(ch))) > 0)
-    {
-        if (ch != '\n')
-        {
-            *buf++ = ch;
-        }
-        else
-        {
-            *buf = '\0';
-            return buf;
-        }
+    int i;
+    char c;
+    for (i = 0; i < max - 1 && read(0, &c, 1) > 0 && c != '\n'; ++i){
+        //fprintf(2, "ch: %c",c);
+        buf[i] = c;
     }
-    return 0;
+
+    if (c == '\n')
+    {
+        buf[i] = c;
+        ++i;
+    }
+    buf[i] = '\0';
+    return i;
 }
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
     if (argc > MAXARG)
     {
@@ -43,44 +39,29 @@ int main(int argc, char const *argv[])
     char *cmd[argc];
     for (int i = 1; i < argc; i++)
     {
-        char *tmp = (char *)malloc(strlen(argv[i]) + 1);
-        strcpy(tmp, argv[i]);
-        *tmp = '\0';
-        *cmd[i - 1] = *tmp;
+        cmd[i - 1] = argv[i];
     }
 
-    int length = 512;
+    char buf[512];
     int n;
-    char *buf;
-    buf = (char *)malloc(length);
-    char ch;
-    while ((n = read(0, &ch, 1)) > 0)
+    while ((n = readline(buf, 512)) > 0)
     {
-        if (ch != '\n')
+        //fprintf(2, "line: %s", buf);
+        int pid = fork();
+        if (pid == -1)
         {
-            *buf++ = ch;
+            fprintf(2, "fork fail");
+            exit(-1);
+        }
+
+        if (pid == 0)
+        {
+            cmd[argc - 1] = buf;
+            exec(cmd[0], cmd);
         }
         else
         {
-            *buf = '\0';
-
-            fprintf(2, "line: %s", *buf);
-            int pid = fork();
-            if (pid == -1)
-            {
-                *cmd[argc - 1] = *buf;
-                fprintf(2, "fork fail");
-                exit(-1);
-            }
-
-            if (pid == 0)
-            {
-                exec(cmd[0], cmd);
-            }
-            else
-            {
-                wait(0);
-            }
+            wait(0);
         }
     }
 
