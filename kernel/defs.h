@@ -183,6 +183,9 @@ int             copyinstr(pagetable_t, char *, uint64, uint64);
 void            vmprint(pagetable_t);
 pagetable_t     copy_kernel_pagetable(void);
 void            proc_kvmmap(pagetable_t, uint64, uint64, uint64, int);
+void            u2kvmcopy(pagetable_t, pagetable_t, uint64, uint64);
+int             copyin_new(pagetable_t, char *, uint64, uint64);
+int             copyinstr_new(pagetable_t, char *, uint64, uint64);
 
 
 // plic.c
