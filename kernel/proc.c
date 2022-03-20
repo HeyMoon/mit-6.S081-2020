@@ -130,6 +130,7 @@ found:
   p->ticks = -1;
   p->alarm_hanlder = -1;
   p->expire_ticks = 0;
+  p->allow_enter = 1;
 
   return p;
 }
