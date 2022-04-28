@@ -97,7 +97,6 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
   }
   else{
-    acquire(&kmem[hart].lock);
     for (int i = 0; i < NCPU; i++)
     {
        if (r)
@@ -116,7 +115,6 @@ kalloc(void)
        }
        release(&kmem[i].lock);
     }
-    release(&kmem[hart].lock);
   }
 
   if(r){
